@@ -1,11 +1,14 @@
 import { handleRpc, tokenOwner } from "@/lib/mcp"
+import { issuer } from "@/lib/oauth"
 
 // Endpoint MCP: https://<dominio>/api/mcp con "Authorization: Bearer <token personal>" (se crea en Integraciones).
 export async function POST(request: Request) {
   const ctx = await tokenOwner(request.headers.get("authorization"))
   if (!ctx) {
     return Response.json({ jsonrpc: "2.0", id: null, error: { code: -32001, message: "Token inválido o revocado." } }, {
-      status: 401, headers: { "WWW-Authenticate": 'Bearer realm="estudio-juridico"' },
+      status: 401,
+      // resource_metadata: así Claude descubre el login estándar.
+      headers: { "WWW-Authenticate": `Bearer realm="estudio-juridico", resource_metadata="${issuer(request)}/.well-known/oauth-protected-resource"` },
     })
   }
   let body: unknown

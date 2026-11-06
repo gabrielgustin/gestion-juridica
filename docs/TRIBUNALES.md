@@ -12,16 +12,13 @@
   - Avisa a los asignados las novedades de causas que ya se seguían.
   - Si falla, reintenta: en 1 hora ante un error, en 24 horas si el conector no está calibrado. Si el portal rechaza las credenciales, frena hasta que el abogado las actualice.
 - **Worker** (`worker/index.ts`): corre fuera de Vercel porque necesita Chromium (Playwright). Cada minuto toma las conexiones que tocan. Dos procesos no pueden correr la misma conexión: se toman con un update atómico.
-- **Tribunal de prueba** (`lib/courts/demo.ts`): simula un portal para probar todo de punta a punta. Solo aparece fuera de producción, o en producción con `ENABLE_DEMO_CONNECTOR=1`.
 
 ## Estado de cada portal
 
 | Portal | Estado |
 |---|---|
 | PJN | En calibración |
-| SCBA (notificaciones) | En calibración |
-| MEV (SCBA) | En calibración |
-| EJE CABA | En calibración |
+| Poder Judicial de Córdoba | En calibración |
 | SRT | En calibración |
 
 "En calibración" significa que el conector todavía no se programó contra el portal real. Antes de eso hay que ver cómo responde cada portal con una cuenta verdadera: el login, si pide captcha o doble factor, el listado de causas, las actuaciones y los adjuntos. Mientras tanto, las conexiones guardan la clave y la sincronización termina con un mensaje claro, sin inventar datos.

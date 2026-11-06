@@ -29,9 +29,9 @@ export async function memberOrNull(): Promise<Pick<Member, "studio" | "user"> | 
   }
 }
 
-/** Bytes usados por los documentos subidos (incluye la papelera: siguen ocupando lugar hasta borrarlos). */
+/** Bytes usados por los documentos subidos (incluye la papelera). Los de Google Drive no cuentan: ocupan el Drive del estudio. */
 export async function storageUsed(studioId: string, source: "upload" | "tribunal" = "upload") {
-  const [{ total }] = await sql<{ total: string }>`select coalesce(sum(size), 0) as total from documents where studio_id = ${studioId} and source = ${source}`
+  const [{ total }] = await sql<{ total: string }>`select coalesce(sum(size), 0) as total from documents where studio_id = ${studioId} and source = ${source} and drive_file_id is null`
   return Number(total)
 }
 

@@ -1,6 +1,6 @@
 import { getMember } from "@/lib/session"
 import { ActionForm } from "@/components/action-form"
-import { deleteStudio, updateStudio } from "../actions"
+import { updateStudio } from "../actions"
 
 export default async function StudioPage() {
   const { studio, role } = await getMember()
@@ -14,11 +14,11 @@ export default async function StudioPage() {
           <fieldset disabled={!admin} className="space-y-4">
             <div className="flex items-center gap-4">
               {studio.logo
-                ? <img src={studio.logo} alt="Logo actual" className="h-16 w-16 rounded object-cover" />
-                : <span className="grid h-16 w-16 place-items-center rounded bg-brand-soft font-serif text-2xl text-brand">{studio.name[0]}</span>}
-              <div className="text-sm">
+                ? <img src={studio.logo} alt="Logo actual" className="h-16 w-36 shrink-0 rounded bg-ink object-contain p-2" />
+                : <span className="grid h-16 w-16 shrink-0 place-items-center rounded bg-brand-soft font-serif text-2xl text-brand">{studio.name[0]}</span>}
+              <div className="min-w-0 text-sm">
                 <label className="label" htmlFor="logo">Logo</label>
-                <input id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp" />
+                <input id="logo" name="logo" type="file" className="w-full text-xs" accept="image/png,image/jpeg,image/webp" />
                 <p className="text-xs text-ink-soft">PNG, JPG o WebP · máx. 2 MB</p>
                 {studio.logo && <label className="mt-1 flex items-center gap-1 text-xs"><input type="checkbox" name="removeLogo" value="1" /> Quitar logo</label>}
               </div>
@@ -31,18 +31,6 @@ export default async function StudioPage() {
         </ActionForm>
       </div>
 
-      {admin && (
-        <div className="card border-danger/30 p-5">
-          <h2 className="text-lg font-medium text-danger">Zona de peligro</h2>
-          <p className="mb-4 text-sm text-ink-soft">
-            Dar de baja el estudio corta el acceso de todo el equipo y frena las sincronizaciones. No se borra ningún dato: se puede recuperar pidiéndolo a soporte.
-          </p>
-          <ActionForm action={deleteStudio} submit="Dar de baja el estudio" danger className="space-y-3">
-            <label className="label" htmlFor="confirm">Escribí «{studio.name}» para confirmar</label>
-            <input id="confirm" name="confirm" className="input" autoComplete="off" />
-          </ActionForm>
-        </div>
-      )}
     </div>
   )
 }

@@ -19,7 +19,7 @@ export async function tokenOwner(header: string | null): Promise<ToolCtx | null>
     select t.id, t.studio_id, t.user_id, s.plan from api_tokens t
     join studios s on s.id = t.studio_id and s.deleted_at is null
     join members m on m.studio_id = t.studio_id and m.user_id = t.user_id and m.active
-    where t.token_hash = ${hashToken(token)} and t.revoked_at is null`
+    where t.token_hash = ${hashToken(token)} and t.revoked_at is null and (t.expires_at is null or t.expires_at > now())`
   if (!row) return null
   await sql`update api_tokens set last_used_at = now() where id = ${row.id} and (last_used_at is null or last_used_at < now() - interval '1 minute')`
   return { studioId: row.studio_id, userId: row.user_id, plan: row.plan }

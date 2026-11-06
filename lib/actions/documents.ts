@@ -5,6 +5,7 @@ import { getMember } from "@/lib/session"
 import { sql } from "@/lib/sql"
 import { DOC_ENTITIES, hasRoomFor, isDocEntity, ownsEntity, type DocEntity } from "@/lib/documents"
 import { deleteStored, storedSize } from "@/lib/storage"
+import { connectionOf, trashFile } from "@/lib/integrations/drive"
 import { ALLOWED_TYPES, isStudioPath } from "@/lib/storage-paths"
 
 function refresh(entity?: string | null, entityId?: string | null) {
@@ -39,8 +40,8 @@ export async function registerDocument(input: { pathname: string; name: string; 
 
 async function ownDoc(id: string) {
   const { studio, user } = await getMember()
-  const [doc] = await sql<{ id: string; pathname: string | null; entity: string | null; entity_id: string | null; deleted_at: Date | null }>`
-    select id, pathname, entity, entity_id, deleted_at from documents where id = ${id} and studio_id = ${studio.id}`
+  const [doc] = await sql<{ studio_id: string; id: string; pathname: string | null; drive_file_id: string | null; entity: string | null; entity_id: string | null; deleted_at: Date | null }>`
+    select studio_id, id, pathname, drive_file_id, entity, entity_id, deleted_at from documents where id = ${id} and studio_id = ${studio.id}`
   if (!doc) throw new Error("No encontramos ese documento.")
   return { doc, studio, user }
 }
@@ -92,7 +93,14 @@ export async function restoreDocument(id: string) {
 /** Borra para siempre (solo desde la papelera): el registro y el archivo. */
 export async function purgeDocument(id: string) {
   const { doc } = await ownDoc(id)
-  if (!doc.deleted_at) throw new Error("Primero mandalo a la papelera.")
+  if (!doc.deleted_at) return { error: "Primero mandalo a la papelera." }
+  if (doc.drive_file_id) {
+    // En Drive no se borra de verdad: va a la papelera de Drive (30 días). Solo se puede con los archivos que subió la app.
+    const conn = await connectionOf(doc.studio_id)
+    if (conn) {
+      try { await trashFile(conn, doc.drive_file_id) } catch { return { error: "Este archivo no lo subió la app: borralo desde Google Drive." } }
+    }
+  }
   if (doc.pathname) await deleteStored(doc.pathname)
   await sql`delete from documents where id = ${id}`
   refresh()

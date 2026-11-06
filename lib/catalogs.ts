@@ -33,7 +33,7 @@ export const DEFAULT_CATALOGS: Record<CatalogKind, Seed[]> = {
     ...c("#0ea5e9", "Inicio"), ...c("#8b5cf6", "Prueba"), ...c("#14b8a6", "Alegatos"), ...c("#f59e0b", "Sentencia"),
     ...c("#ef4444", "Recursos"), ...c("#22c55e", "Ejecución"), ...c("#64748b", "Conciliado"),
   ],
-  fuero: c("#475569", "Civil", "Comercial", "Laboral", "Penal", "Contencioso Administrativo", "Familia", "Seguridad Social"),
+  fuero: c("#475569", "Civil y Comercial", "Laboral", "Penal", "Contencioso Administrativo", "Familia", "Concursos y Quiebras", "Violencia Familiar", "Federal", "Seguridad Social"),
   parte: [...c("#2563eb", "Actora"), ...c("#dc2626", "Demandada"), ...c("#64748b", "Tercero")],
   calendario: c("#7a2e3a", "General"),
   estado_tarea: [

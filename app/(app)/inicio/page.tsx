@@ -46,12 +46,6 @@ export default async function InicioPage() {
   const doneCount = steps.filter((s) => s.done).length
   const showOnboarding = !settings?.hide_onboarding && doneCount < steps.length
 
-  const counters = [
-    { label: "Expedientes activos", value: c.activos, href: "/expedientes" },
-    { label: "Míos", value: c.mios, href: "/expedientes?mios=1" },
-    { label: "Esta semana", value: c.semana, hint: "próximos 7 días", href: "/calendario?vista=agenda" },
-    { label: "Retrasadas", value: c.retrasadas, href: "/calendario?vista=tabla&estado=retrasado", alert: Number(c.retrasadas) > 0 },
-  ]
   const ctx = { studioId: studio.id, userId: user.id }
 
   return (
@@ -86,18 +80,8 @@ export default async function InicioPage() {
         </section>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {counters.map((k) => (
-          <Link key={k.label} href={k.href} className="card p-4 hover:border-brand">
-            <div className="label">{k.label}</div>
-            <div className={`text-3xl font-medium ${k.alert ? "text-danger" : ""}`}>{Number(k.value)}</div>
-            {k.hint && <div className="text-xs text-ink-soft">{k.hint}</div>}
-          </Link>
-        ))}
-      </div>
-
       {widgets.length === 0 && <p className="text-sm text-ink-soft">Ocultaste todos los paneles. Volvé a elegirlos en «Personalizar».</p>}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {widgets.map((id) => {
           const Widget = WIDGET_COMPONENTS[id]
           return <Widget key={id} {...ctx} />

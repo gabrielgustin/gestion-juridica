@@ -22,7 +22,7 @@ export function authUrl(state: string) {
 
 type Tokens = { access_token: string; refresh_token?: string; expires_in: number }
 
-async function tokenRequest(body: Record<string, string>): Promise<Tokens> {
+export async function tokenRequest(body: Record<string, string>): Promise<Tokens> {
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

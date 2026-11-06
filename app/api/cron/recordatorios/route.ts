@@ -1,5 +1,7 @@
 import { timingSafeEqual } from "node:crypto"
 import { deliverDueReminders } from "@/lib/notifications"
+import { sql } from "@/lib/sql"
+import { syncFolder } from "@/lib/integrations/drive"
 
 // Vercel Cron llama acá (ver vercel.json) con "Authorization: Bearer $CRON_SECRET".
 export async function GET(request: Request) {
@@ -10,5 +12,14 @@ export async function GET(request: Request) {
     return Response.json({ error: "No autorizado" }, { status: 401 })
   }
   const sent = await deliverDueReminders()
-  return Response.json({ sent })
+  // Drive: pone al día Documentos con lo que el estudio movió a mano a su carpeta (cada 15 minutos).
+  const studios = await sql<{ studio_id: string }>`select studio_id from studio_drive`
+  let drive = 0
+  for (const { studio_id } of studios) {
+    try { await syncFolder(studio_id); drive++ } catch (e) {
+      console.error("[drive] cron", e)
+      await sql`update studio_drive set status = 'error', last_error = ${e instanceof Error ? e.message : String(e)} where studio_id = ${studio_id}`
+    }
+  }
+  return Response.json({ sent, drive })
 }

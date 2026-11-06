@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Folder } from "lucide-react"
 import { getMember } from "@/lib/session"
+import { connectionOf } from "@/lib/integrations/drive"
 import { query } from "@/lib/sql"
 import { DOC_ENTITIES, isDocEntity, storageUsed, type DocEntity } from "@/lib/documents"
 import { blobEnabled } from "@/lib/storage"
@@ -18,6 +19,7 @@ const VIEWS: { id: DocView; label: string }[] = [
 
 export default async function DocumentsPage({ searchParams }: { searchParams: Promise<Params> }) {
   const { studio, user } = await getMember()
+  const driveOn = Boolean(await connectionOf(studio.id))
   const params = await searchParams
   const folderEntity = isDocEntity(one(params.carpeta)) ? (one(params.carpeta) as DocEntity) : null
   const folderId = /^[0-9a-f-]{36}$/i.test(one(params.id)) ? one(params.id) : null
@@ -48,7 +50,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
   }
 
   const navLink = (href: string, label: string, active: boolean, extra?: string) => (
-    <Link href={href} className={`flex justify-between rounded px-2 py-1.5 text-sm ${active ? "bg-brand-soft font-medium text-brand" : "hover:bg-paper"}`}>
+    <Link key={href} href={href} className={`flex justify-between rounded px-2 py-1.5 text-sm ${active ? "bg-brand-soft font-medium text-brand" : "hover:bg-paper"}`}>
       <span>{label}</span>{extra && <span className="text-xs text-ink-soft">{extra}</span>}
     </Link>
   )
@@ -66,7 +68,8 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         </nav>
         <div className="card p-3 text-sm">
           <div className="label">Almacenamiento</div>
-          <div>{formatSize(used)} de {formatSize(total)}</div>
+          {driveOn && <div className="mb-1 text-xs text-ink-soft">Los archivos nuevos se guardan en el Google Drive del estudio.</div>}
+          <div>{formatSize(used)} de {formatSize(total)}{driveOn ? " en el sistema" : ""}</div>
           <div className="mt-1 h-1.5 rounded bg-line" role="progressbar" aria-label="Almacenamiento usado" aria-valuenow={Math.round((used / total) * 100)} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full rounded bg-brand" style={{ width: `${Math.min(100, (used / total) * 100)}%` }} />
           </div>
@@ -84,7 +87,7 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
 
         {view !== "papelera" && view !== "destacados" && !(folderEntity && !folderId) && (
           <div className="space-y-2">
-            <Uploader studioId={studio.id} blob={blobEnabled} entity={folderEntity ?? undefined} entityId={folderId ?? undefined} isWrit={view === "escritos"} />
+            <Uploader studioId={studio.id} blob={blobEnabled} drive={driveOn} entity={folderEntity ?? undefined} entityId={folderId ?? undefined} isWrit={view === "escritos"} />
             <LinkExternal entity={folderEntity ?? undefined} entityId={folderId ?? undefined} />
           </div>
         )}

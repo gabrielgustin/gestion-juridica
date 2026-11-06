@@ -23,7 +23,7 @@ export default async function MikeSettingsPage() {
         <div>
           <label className="label" htmlFor="identity">Identidad y criterios</label>
           <textarea id="identity" name="identity" rows={6} maxLength={10_000} defaultValue={settings.identity ?? ""} className="input"
-            placeholder="Ej.: Somos un estudio laboralista que representa trabajadores en CABA y Provincia. Firmamos como Dra. … Preferimos escritos concisos…" />
+            placeholder="Ej.: Somos un estudio laboralista que representa trabajadores en Córdoba Capital y el interior. Firmamos como Dra. … Preferimos escritos concisos…" />
         </div>
         <div>
           <label className="label" htmlFor="watch">Qué vigilar</label>

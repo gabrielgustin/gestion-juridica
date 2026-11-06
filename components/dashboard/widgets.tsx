@@ -11,7 +11,7 @@ const dmy = (d: Date) => ymdOf(d).split("-").reverse().join("/")
 
 function Card({ title, href, children }: { title: string; href?: string; children: React.ReactNode }) {
   return (
-    <section className="card flex flex-col p-4" aria-label={title}>
+    <section className="card flex min-w-0 flex-col p-4" aria-label={title}>
       <div className="mb-2 flex items-center justify-between">
         <h2 className="font-medium">{title}</h2>
         {href && <Link href={href} className="text-sm text-brand hover:underline">Ver todo</Link>}
