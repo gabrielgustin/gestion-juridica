@@ -6,6 +6,7 @@ import { CONTACTS, type ContactEntity } from "@/lib/contacts"
 import { loadLinks } from "@/lib/entities"
 import { ContactForm } from "./contact-form"
 import { DeleteContactButton } from "./delete-button"
+import { EntityDocuments } from "@/components/documents/entity-documents"
 
 export async function ContactDetail({ entity, id }: { entity: ContactEntity; id: string }) {
   const { studio } = await getMember()
@@ -31,6 +32,7 @@ export async function ContactDetail({ entity, id }: { entity: ContactEntity; id:
         <DeleteContactButton entity={entity} id={id} />
       </div>
       <ContactForm entity={entity} record={record} links={links} />
+      <EntityDocuments entity={entity} id={id} />
       <div className="card max-w-3xl p-5">
         <h2 className="mb-2 font-medium">Expedientes ({matters.length})</h2>
         {matters.length === 0 && <p className="text-sm text-ink-soft">Sin expedientes vinculados.</p>}

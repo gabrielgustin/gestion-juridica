@@ -32,7 +32,7 @@ export async function updateStudio(_: ActionResult, form: FormData): Promise<Act
   if (logo instanceof File && logo.size > 0) {
     if (!["image/png", "image/jpeg", "image/webp"].includes(logo.type)) return { error: "El logo tiene que ser PNG, JPG o WebP." }
     if (logo.size > MAX_LOGO) return { error: "El logo pesa más de 2 MB." }
-    // shortcut: el logo se guarda como data URL en la base; pasarlo a Vercel Blob en la fase de Documentos.
+    // shortcut: el logo (máx. 2 MB) se guarda como data URL en la base; pasarlo a Blob si se suman más imágenes de marca.
     logoData = `data:${logo.type};base64,${Buffer.from(await logo.arrayBuffer()).toString("base64")}`
   }
   if (form.get("removeLogo") === "1") logoData = ""
@@ -82,25 +82,26 @@ export async function revokeInvite(id: string) {
   revalidatePath("/configuracion/usuarios")
 }
 
-async function assertAnotherAdmin(studioId: string, userId: string) {
+async function hasAnotherAdmin(studioId: string, userId: string) {
   const [{ count }] = await sql<{ count: string }>`
     select count(*) from members where studio_id = ${studioId} and role = 'admin' and active and user_id <> ${userId}`
-  if (Number(count) === 0) throw new Error("El estudio necesita al menos un administrador activo.")
+  return Number(count) > 0
 }
+const LAST_ADMIN = { error: "El estudio necesita al menos un administrador activo." }
 
 export async function setMemberRole(userId: string, newRole: Role) {
   const { studio, user } = await requireAdmin()
   role.parse(newRole)
-  if (userId === user.id) throw new Error("No podés cambiar tu propio rol.")
-  if (newRole !== "admin") await assertAnotherAdmin(studio.id, userId)
+  if (userId === user.id) return { error: "No podés cambiar tu propio rol." }
+  if (newRole !== "admin" && !(await hasAnotherAdmin(studio.id, userId))) return LAST_ADMIN
   await sql`update members set role = ${newRole} where studio_id = ${studio.id} and user_id = ${userId}`
   revalidatePath("/configuracion/usuarios")
 }
 
 export async function setMemberActive(userId: string, active: boolean) {
   const { studio, user } = await requireAdmin()
-  if (userId === user.id) throw new Error("No podés desactivarte a vos mismo.")
-  if (!active) await assertAnotherAdmin(studio.id, userId)
+  if (userId === user.id) return { error: "No podés desactivarte a vos mismo." }
+  if (!active && !(await hasAnotherAdmin(studio.id, userId))) return LAST_ADMIN
   await sql`update members set active = ${active} where studio_id = ${studio.id} and user_id = ${userId}`
   // Cierra las sesiones abiertas de quien se desactiva.
   if (!active) await sql`delete from "session" where "userId" = ${userId}`
@@ -157,7 +158,7 @@ export async function addCatalogItem(_: ActionResult, form: FormData): Promise<A
     insert into catalog_items (studio_id, kind, name, color, category, sort)
     values (${studio.id}, ${k}, ${name}, ${c}, ${cat ?? null},
       (select coalesce(max(sort), -1) + 1 from catalog_items where studio_id = ${studio.id} and kind = ${k}))
-    on conflict (studio_id, kind, name) do nothing returning id`
+    on conflict (studio_id, kind, name) where source is null do nothing returning id`
   if (!rows.length) return { error: "Ya existe uno con ese nombre." }
   revalidateCatalog(k)
   return { ok: "Agregado." }
@@ -191,11 +192,14 @@ export async function updateCatalogItem(id: string, changes: z.infer<typeof patc
 
 export async function deleteCatalogItem(id: string) {
   const { studio } = await requireAdmin()
+  const [own] = await sql<{ source: string | null }>`select source from catalog_items where id = ${id} and studio_id = ${studio.id}`
+  if (own?.source) return { error: "Los estados que informa un tribunal no se borran: podés renombrarlos o cambiarles el color." }
   const [usage] = await sql<{ n: string }>`
     select (select count(*) from matters where ${id} in (fuero_id, estado_id, etapa_id, parte_id))
          + (select count(*) from clients where type_id = ${id})
          + (select count(*) from courts where type_id = ${id})
-         + (select count(*) from taggings where tag_id = ${id}) as n`
+         + (select count(*) from taggings where tag_id = ${id})
+         + (select count(*) from tasks where ${id} in (calendar_id, status_id)) as n`
   if (Number(usage.n) > 0) return { error: `Lo usan ${usage.n} registro(s). Desactivalo en lugar de borrarlo.` }
   const [row] = await sql<{ kind: CatalogKind }>`delete from catalog_items where id = ${id} and studio_id = ${studio.id} returning kind`
   if (row) revalidateCatalog(row.kind)

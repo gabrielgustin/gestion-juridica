@@ -13,6 +13,7 @@ export const CATALOGS = {
   etapa: { slug: "etapas", label: "Etapas", group: "Expedientes", hint: "En qué momento procesal está la causa." },
   fuero: { slug: "fueros", label: "Fueros", group: "Expedientes", hint: "Fueros con los que trabaja el estudio." },
   parte: { slug: "partes", label: "Partes", group: "Expedientes", hint: "Qué rol tiene el cliente en la causa." },
+  calendario: { slug: "calendarios", label: "Calendarios", group: "Calendario", hint: "Agendas separadas (por ejemplo, una por abogado o por área). Cada tarea o evento va en una." },
   estado_tarea: { slug: "estados-tarea", label: "Estados de tarea", group: "Calendario", hint: "La categoría define el significado: una tarea vencida que no está en Completados ni Finalizados figura como retrasada. Un evento sin estado es una alerta." },
   tipo_cliente: { slug: "tipos-cliente", label: "Tipos de cliente", group: "Clientes", hint: "Cómo clasificás a tus clientes." },
   tipo_juzgado: { slug: "tipos-juzgado", label: "Tipos de juzgado", group: "Juzgados", hint: "Cómo clasificás a los juzgados." },
@@ -34,6 +35,7 @@ export const DEFAULT_CATALOGS: Record<CatalogKind, Seed[]> = {
   ],
   fuero: c("#475569", "Civil", "Comercial", "Laboral", "Penal", "Contencioso Administrativo", "Familia", "Seguridad Social"),
   parte: [...c("#2563eb", "Actora"), ...c("#dc2626", "Demandada"), ...c("#64748b", "Tercero")],
+  calendario: c("#7a2e3a", "General"),
   estado_tarea: [
     { name: "Pendiente", color: "#94a3b8", category: "inactivo" },
     { name: "En curso", color: "#2563eb", category: "activo" },

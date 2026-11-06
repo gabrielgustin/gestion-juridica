@@ -59,6 +59,7 @@ export async function deleteContact(entity: ContactEntity, id: string): Promise<
   if (Number(usage.n) > 0) return { error: `Tiene ${usage.n} expediente(s) vinculados. Desactivalo en lugar de borrarlo.` }
   const deleted = await query(`delete from ${config.table} where id = $1 and studio_id = $2 returning id`, [id, studio.id])
   if (!deleted.length) return { error: "No encontramos ese registro." }
+  await sql`update documents set entity = null, entity_id = null where entity = ${entity} and entity_id = ${id}`
   await sql`delete from assignments where entity = ${entity} and entity_id = ${id}`
   await sql`delete from taggings where entity = ${entity} and entity_id = ${id}`
   revalidatePath(config.path)

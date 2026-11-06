@@ -9,10 +9,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:migrate": "node db/migrate.mjs",
-    "check": "tsc --noEmit && vitest run"
+    "check": "tsc --noEmit && vitest run",
+    "worker": "node --conditions=react-server --import tsx worker/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.5.0",
     "@electric-sql/pglite": "^0.5.8",
+    "@vercel/blob": "^2.8.2",
     "better-auth": "^1.7.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.454.0",
@@ -31,6 +34,7 @@
     "@types/react-dom": "^19",
     "postcss": "^8.5",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^3.2.7"
   }

@@ -6,7 +6,9 @@ export type Entity = "matter" | "client" | "court" | "task"
 export type Option = { id: string; name: string; color?: string }
 
 export const catalogOptions = (studioId: string, kind: CatalogKind) =>
-  sql<Option>`select id, name, color from catalog_items where studio_id = ${studioId} and kind = ${kind} and active order by sort, name`
+  // Los estados de tribunal llevan el portal al lado (varios informan "EN TRÁMITE").
+  sql<Option>`select id, name || coalesce(' · ' || upper(source), '') as name, color from catalog_items
+    where studio_id = ${studioId} and kind = ${kind} and active order by source nulls first, sort, name`
 
 export const memberOptions = (studioId: string) =>
   sql<Option>`select u.id, u.name from members m join "user" u on u.id = m.user_id where m.studio_id = ${studioId} and m.active order by u.name`

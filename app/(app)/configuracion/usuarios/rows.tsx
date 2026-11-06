@@ -7,10 +7,10 @@ import { revokeInvite, setMemberActive, setMemberRole } from "../actions"
 function useSafeAction() {
   const [pending, start] = useTransition()
   const [error, setError] = useState("")
-  const run = (fn: () => Promise<unknown>) =>
+  const run = (fn: () => Promise<{ error?: string } | void>) =>
     start(async () => {
       setError("")
-      try { await fn() } catch (e) { setError(e instanceof Error ? e.message : "No se pudo guardar.") }
+      try { setError((await fn())?.error ?? "") } catch { setError("No se pudo guardar.") }
     })
   return { pending, error, run }
 }

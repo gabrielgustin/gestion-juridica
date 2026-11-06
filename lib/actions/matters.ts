@@ -155,6 +155,7 @@ export async function purgeMatter(id: string) {
   if (!matter.deleted_at) throw new Error("Primero mandalo a la papelera.")
   await sql`delete from assignments where entity = 'matter' and entity_id = ${id}`
   await sql`delete from taggings where entity = 'matter' and entity_id = ${id}`
+  await sql`update documents set entity = null, entity_id = null where entity = 'matter' and entity_id = ${id}`
   await sql`delete from matters where id = ${id}`
   revalidatePath("/expedientes")
   redirect("/expedientes?vista=papelera")

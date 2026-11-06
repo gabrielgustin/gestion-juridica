@@ -2,6 +2,8 @@
 const nextConfig = {
   // Paquetes con binarios o WASM: se cargan desde node_modules, sin empaquetar.
   serverExternalPackages: ["@electric-sql/pglite", "pg"],
+  // Adjuntos para Mike en local (en producción van por Blob y el pedido solo lleva sus rutas).
+  experimental: { serverActions: { bodySizeLimit: "45mb" } },
   async headers() {
     return [
       {
