@@ -24,7 +24,7 @@ export function Customize({ selected }: { selected: WidgetId[] }) {
     <div className="relative">
       <button type="button" className="btn-ghost" aria-expanded={open} onClick={() => setOpen(!open)}>Personalizar</button>
       {open && (
-        <div className="absolute right-0 z-30 mt-1 w-80 rounded-lg border border-line bg-white p-3 shadow-lg">
+        <div className="absolute left-0 z-30 mt-1 w-[calc(100vw-2rem)] max-w-80 sm:left-auto sm:right-0 rounded-lg border border-line bg-white p-3 shadow-lg">
           <p className="mb-2 text-sm text-ink-soft">Elegí qué paneles ver y ordenalos.</p>
           <ul className="space-y-1">
             {order.map((id, i) => {

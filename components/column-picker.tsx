@@ -25,7 +25,7 @@ export function ColumnPicker({ tableId, columns }: { tableId: string; columns: {
       <style>{hidden.map((k) => `#${tableId} [data-col="${k}"]{display:none}`).join("")}</style>
       <button type="button" className="btn-ghost" aria-expanded={open} onClick={() => setOpen(!open)}>Editar columnas</button>
       {open && (
-        <div className="absolute right-0 z-20 mt-1 w-52 rounded-md border border-line bg-white p-2 shadow">
+        <div className="absolute left-0 z-20 mt-1 w-52 sm:left-auto sm:right-0 rounded-md border border-line bg-white p-2 shadow">
           {columns.map((c) => (
             <label key={c.key} className="flex items-center gap-2 px-1 py-1 text-sm">
               <input type="checkbox" checked={!hidden.includes(c.key)} onChange={() => toggle(c.key)} /> {c.label}

@@ -127,20 +127,24 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
           {view === "calendario" && range === "mes" && (
             <div className="card overflow-x-auto">
-              <div className="grid min-w-[42rem] grid-cols-7 border-b border-line text-center text-xs text-ink-soft">
+              <div className="grid grid-cols-7 border-b border-line text-center sm:min-w-[42rem] text-xs text-ink-soft">
                 {WEEKDAYS.map((d) => <div key={d} className="p-2">{d}</div>)}
               </div>
               {monthGrid(anchor).map((week) => (
-                <div key={week[0]} className="grid min-w-[42rem] grid-cols-7 border-b border-line last:border-0">
+                <div key={week[0]} className="grid grid-cols-7 border-b border-line last:border-0 sm:min-w-[42rem]">
                   {week.map((d) => {
                     const list = days.get(d) ?? []
                     return (
-                      <div key={d} className={`min-h-24 border-r border-line p-1 last:border-0 ${d.slice(0, 7) !== anchor.slice(0, 7) ? "bg-paper/60 text-ink-soft" : ""}`}>
+                      <div key={d} className={`min-h-16 min-w-0 border-r border-line p-1 sm:min-h-24 last:border-0 ${d.slice(0, 7) !== anchor.slice(0, 7) ? "bg-paper/60 text-ink-soft" : ""}`}>
                         <Link href={link({ rango: "dia", fecha: d })}
                           className={`mb-1 inline-grid h-6 w-6 place-items-center rounded-full text-xs ${d === today ? "bg-brand text-white" : "hover:bg-line"}`}>
                           {Number(d.slice(8))}
                         </Link>
-                        <div className="space-y-0.5">
+                        {/* En celular las tareas se ven como puntos; al tocar el día se abre su detalle. */}
+                        <div className="flex flex-wrap gap-0.5 sm:hidden" aria-label={`${list.length} tareas`}>
+                          {list.slice(0, 4).map((t) => <span key={t.id} className="h-1.5 w-1.5 rounded-full bg-brand" />)}
+                        </div>
+                        <div className="hidden space-y-0.5 sm:block">
                           {list.slice(0, 3).map((t) => <TaskPill key={t.id} task={t} />)}
                           {list.length > 3 && <Link href={link({ rango: "dia", fecha: d })} className="block text-xs text-brand">+{list.length - 3} más</Link>}
                         </div>
