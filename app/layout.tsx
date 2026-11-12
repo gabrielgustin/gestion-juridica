@@ -1,14 +1,15 @@
 import type { Metadata } from "next"
-import { Montserrat } from "next/font/google"
+import { Inter, Lora } from "next/font/google"
 import "./globals.css"
 
-const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const lora = Lora({ subsets: ["latin"], variable: "--font-lora" })
 
-export const metadata: Metadata = { title: "Cambel Red Jurídica", description: "Gestión de causas para estudios jurídicos" }
+export const metadata: Metadata = { title: "Cobos Porta · Abogado", description: "Gestión de causas para estudios jurídicos" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" className={`${montserrat.variable}`}>
+    <html lang="es-AR" className={`${inter.variable} ${lora.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

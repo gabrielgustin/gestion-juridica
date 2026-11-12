@@ -28,7 +28,7 @@ export function AppSidebar({ userName, children }: { userName: string; children:
     <aside className="sticky top-0 z-40 flex max-h-screen shrink-0 flex-col overflow-y-auto border-line bg-ink text-white md:static md:max-h-none md:min-h-screen md:w-60 md:overflow-visible md:border-r">
       <div className="flex items-center justify-between px-4 py-3 md:py-4">
         <div className="min-w-0">
-          <Link href="/inicio"><img src="/logo-cambel.png" alt="Cambel Red Jurídica" className="h-9 w-auto" /></Link>
+          <Link href="/inicio"><img src="/logo-horizontal-negativo.svg" alt="Cobos Porta · Abogado" className="h-14 w-auto" /></Link>
           <div className="mt-1 truncate text-sm text-white/80">{userName}</div>
         </div>
         <button type="button" className="rounded-md p-2 hover:bg-white/10 md:hidden" aria-expanded={open} aria-controls="menu-principal" aria-label={open ? "Cerrar menú" : "Abrir menú"} onClick={() => setOpen(!open)}>

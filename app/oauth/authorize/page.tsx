@@ -10,7 +10,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="grid min-h-screen place-items-center bg-ink p-4">
       <div className="w-full max-w-md">
-        <img src="/logo-cambel.png" alt="Cambel Red Jurídica" className="mx-auto mb-6 w-56" />
+        <img src="/logo-vertical-negativo.svg" alt="Cobos Porta · Abogado" className="mx-auto mb-6 w-48" />
         <div className="rounded-lg bg-white p-6">{children}</div>
       </div>
     </main>

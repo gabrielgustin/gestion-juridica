@@ -4,23 +4,24 @@
 @source not "../db";
 
 @theme {
-  --color-ink: #0a2b40;
-  --color-ink-soft: #4d6a80;
-  --color-paper: #f4f1ec;
+  --color-ink: #1b2a4a;
+  --color-ink-soft: #4b5567;
+  --color-paper: #f7f5f0;
   --color-card: #ffffff;
-  --color-line: #e2ddd3;
-  --color-brand: #eb654d;
-  --color-brand-soft: #fdeae6;
+  --color-line: #e3dfd5;
+  --color-brand: #1b2a4a;
+  --color-gold: #85672a;
+  --color-brand-soft: #e8f1fa;
   --color-ok: #15803d;
   --color-danger: #b91c1c;
-  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), Georgia, serif;
 }
 
 /* Los fieldset no se achican por defecto y desbordan en pantallas chicas. */
 fieldset { min-width: 0; }
 
-h1, h2, h3 { font-weight: 400; letter-spacing: -0.02em; }
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 600; }
 
 body {
   background: var(--color-paper);
