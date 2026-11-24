@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 vi.mock("server-only", () => ({}))
 vi.mock("@/lib/sql", () => ({ sql: vi.fn(), query: vi.fn() }))
 vi.mock("@/lib/ai/tools", () => ({
-  TOOLS: [{ name: "agenda", description: "d", input_schema: { type: "object", properties: {} } }],
+  TOOLS: [{ name: "agenda", description: "d", input_schema: { type: "object", properties: {} } }, { name: "crear_tarea", description: "d", input_schema: { type: "object", properties: {} } }],
   runTool: vi.fn(async (name: string) => ({ content: `"ok ${name}"`, isError: false })),
 }))
 
@@ -34,5 +34,10 @@ describe("handleRpc", async () => {
   it("tokens con formato fijo y hash estable", () => {
     expect(newToken()).toMatch(/^ej_[0-9a-f]{64}$/)
     expect(hashToken("a")).toBe(hashToken("a"))
+  })
+  it("marca qué herramientas solo leen (ChatGPT pide confirmación para las demás)", async () => {
+    const r: any = await handleRpc({ jsonrpc: "2.0", id: 9, method: "tools/list" }, ctx)
+    const byName = Object.fromEntries(r.result.tools.map((t: any) => [t.name, t.annotations.readOnlyHint]))
+    expect(byName).toEqual({ agenda: true, crear_tarea: false })
   })
 })

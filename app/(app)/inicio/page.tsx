@@ -4,6 +4,7 @@ import { getMember } from "@/lib/session"
 import { query, sql } from "@/lib/sql"
 import { cleanWidgets } from "@/lib/dashboard"
 import { OVERDUE_SQL } from "@/lib/tasks"
+import { calendarEnabled } from "@/lib/integrations/google-calendar"
 import { WIDGET_COMPONENTS } from "@/components/dashboard/widgets"
 import { Customize, HideOnboarding } from "@/components/dashboard/customize"
 import { Sparkles } from "lucide-react"
@@ -31,7 +32,9 @@ export default async function InicioPage() {
       (select name <> $3 or logo is not null from studios where id = $1) as paso_estudio,
       exists (select 1 from matters where studio_id = $1) as paso_expediente,
       exists (select 1 from tasks where studio_id = $1) as paso_tarea,
-      exists (select 1 from documents where studio_id = $1) as paso_documento`,
+      exists (select 1 from documents where studio_id = $1) as paso_documento,
+      exists (select 1 from user_integrations where user_id = $2 and provider = 'google_calendar') as paso_calendario,
+      exists (select 1 from api_tokens where user_id = $2) as paso_ia`,
     [studio.id, user.id, `Estudio de ${user.name || user.email.split("@")[0]}`],
   )
 
@@ -40,6 +43,8 @@ export default async function InicioPage() {
     { done: c.paso_expediente, label: "Cargá tu primer expediente", href: "/expedientes/nuevo" },
     { done: c.paso_tarea, label: "Agendá una tarea o un vencimiento", href: "/calendario/nuevo" },
     { done: c.paso_documento, label: "Subí un documento", href: "/documentos" },
+    ...(calendarEnabled() ? [{ done: c.paso_calendario, label: "Conectá tu Google Calendar", href: "/integraciones#agenda" }] : []),
+    { done: c.paso_ia, label: "Conectá tu Claude o ChatGPT (opcional)", href: "/integraciones#mcp" },
   ].filter((s) => !s.admin || role === "admin")
   const doneCount = steps.filter((s) => s.done).length
   const showOnboarding = !settings?.hide_onboarding && doneCount < steps.length

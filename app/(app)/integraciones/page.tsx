@@ -188,18 +188,32 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
       <h2 id="mcp" className="scroll-mt-4 font-serif text-2xl">Conector MCP</h2>
       <section className="card space-y-3 p-5">
         <div>
-          <h3 className="text-lg font-medium">Usá el estudio desde Claude</h3>
+          <h3 className="text-lg font-medium">Usá el estudio desde Claude o ChatGPT</h3>
           <p className="text-sm text-ink-soft">
-            Conectá tu Claude y consultá tus causas, tu agenda y tus clientes desde el chat, con las mismas herramientas que Mike.
-            Este uso no descuenta créditos del estudio: lo cubre tu propio plan de Claude.
+            Es opcional. Conectá tu Claude o tu ChatGPT y consultá tus causas, tu agenda y tus clientes desde el chat, con las mismas herramientas que Mike.
+            Este uso no descuenta créditos del estudio: lo cubre tu propio plan.
           </p>
-          <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
-            <li>En Claude, andá a Configuración → Conectores → Agregar conector personalizado.</li>
-            <li>Pegá la dirección de abajo y poné el nombre que quieras.</li>
-            <li>Entrá con tu usuario del estudio y tocá «Permitir». Se hace una sola vez.</li>
-          </ol>
-          <p className="mt-2 text-xs text-ink-soft">Para Claude Code u otras herramientas técnicas también podés usar un token personal:</p>
-          <p className="mt-2 text-sm">Dirección del servidor: <code className="rounded bg-paper px-1">{`${appOrigin()}/api/mcp`}</code></p>
+          <p className="mt-3 text-sm">Dirección del servidor: <code className="break-all rounded bg-paper px-1">{`${appOrigin()}/api/mcp`}</code></p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div className="rounded-md border border-line p-3">
+              <p className="font-medium">Claude</p>
+              <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm">
+                <li>En Claude, andá a Configuración → Conectores → Agregar conector personalizado.</li>
+                <li>Pegá la dirección del servidor y poné el nombre que quieras.</li>
+                <li>Entrá con tu usuario del estudio y tocá «Permitir».</li>
+              </ol>
+            </div>
+            <div className="rounded-md border border-line p-3">
+              <p className="font-medium">ChatGPT</p>
+              <ol className="mt-1 list-decimal space-y-1 pl-5 text-sm">
+                <li>En ChatGPT (web), andá a Plugins → + → Add custom MCP server.</li>
+                <li>Pegá la dirección del servidor y elegí autenticación OAuth.</li>
+                <li>Entrá con tu usuario del estudio, tocá «Permitir» e instalá el plugin.</li>
+              </ol>
+              <p className="mt-1 text-xs text-ink-soft">Depende de tu plan de ChatGPT. Antes de crear tareas o guardar escritos, ChatGPT te pide confirmación.</p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-ink-soft">Se conecta una sola vez. Para Claude Code u otras herramientas técnicas también podés usar un token personal:</p>
         </div>
         <TokenManager tokens={tokens} endpoint={`${appOrigin()}/api/mcp`} />
       </section>

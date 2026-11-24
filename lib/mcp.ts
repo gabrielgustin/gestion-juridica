@@ -1,6 +1,9 @@
 import "server-only"
 import { createHash, randomBytes } from "node:crypto"
 import { sql } from "@/lib/sql"
+
+/** Herramientas que crean datos en el estudio; el resto solo lee. */
+const WRITE_TOOLS = new Set(["crear_tarea", "guardar_escrito"])
 import { runTool, TOOLS, type ToolCtx } from "@/lib/ai/tools"
 
 // Conector MCP (transporte Streamable HTTP, respuestas JSON sin streaming).
@@ -46,7 +49,11 @@ export async function handleRpc(message: JsonRpc, ctx: ToolCtx) {
     case "ping":
       return ok(message.id, {})
     case "tools/list":
-      return ok(message.id, { tools: TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: t.input_schema })) })
+      return ok(message.id, { tools: TOOLS.map((t) => ({
+        name: t.name, description: t.description, inputSchema: t.input_schema,
+        // ChatGPT trata como escritura (y pide confirmación) toda herramienta sin readOnlyHint.
+        annotations: { readOnlyHint: !WRITE_TOOLS.has(t.name), destructiveHint: false, openWorldHint: false },
+      })) })
     case "tools/call": {
       const name = message.params?.name
       if (typeof name !== "string") return fail(message.id, -32602, "Falta el nombre de la herramienta")

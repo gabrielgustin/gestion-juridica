@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
 // Chequeo optimista: cada página igual valida la sesión real en el servidor (lib/session.ts).
-const PUBLIC = ["/login", "/restablecer", "/sin-acceso", "/api/auth", "/api/cron", "/api/mcp", "/api/oauth", "/.well-known"]
+const PUBLIC = ["/login", "/privacidad", "/terminos", "/restablecer", "/sin-acceso", "/api/auth", "/api/cron", "/api/mcp", "/api/oauth", "/.well-known"]
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
