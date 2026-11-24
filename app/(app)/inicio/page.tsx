@@ -29,7 +29,6 @@ export default async function InicioPage() {
           and coalesce(st.category, '') not in ('completado', 'finalizado')) as semana,
       (select count(*) from tasks t left join catalog_items st on st.id = t.status_id where t.studio_id = $1 and ${OVERDUE_SQL}) as retrasadas,
       (select name <> $3 or logo is not null from studios where id = $1) as paso_estudio,
-      (select count(*) > 1 from members where studio_id = $1) or exists (select 1 from invitations where studio_id = $1) as paso_equipo,
       exists (select 1 from matters where studio_id = $1) as paso_expediente,
       exists (select 1 from tasks where studio_id = $1) as paso_tarea,
       exists (select 1 from documents where studio_id = $1) as paso_documento`,
@@ -38,7 +37,6 @@ export default async function InicioPage() {
 
   const steps = [
     { done: c.paso_estudio, label: "Poné el nombre y el logo del estudio", href: "/configuracion/estudio", admin: true },
-    { done: c.paso_equipo, label: "Invitá a tu equipo", href: "/configuracion/usuarios", admin: true },
     { done: c.paso_expediente, label: "Cargá tu primer expediente", href: "/expedientes/nuevo" },
     { done: c.paso_tarea, label: "Agendá una tarea o un vencimiento", href: "/calendario/nuevo" },
     { done: c.paso_documento, label: "Subí un documento", href: "/documentos" },
