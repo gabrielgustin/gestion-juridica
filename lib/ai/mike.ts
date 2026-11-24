@@ -3,8 +3,8 @@ import type Anthropic from "@anthropic-ai/sdk"
 import { toFile } from "@anthropic-ai/sdk"
 import { sql } from "@/lib/sql"
 import { formatDay, hmOf, todayYmd } from "@/lib/dates"
-import { aiClient, aiSettings, charge, FALLBACK, MODEL } from "./state"
-import { sumUsage, type Usage } from "./credits"
+import { aiClient, aiSettings, charge, MODEL } from "./state"
+import { type Usage } from "./credits"
 import { runTool, TOOLS, type ToolCtx } from "./tools"
 
 type Param = Anthropic.Beta.BetaMessageParam
@@ -83,7 +83,6 @@ export async function converse(opts: { conversationId: string; studio: { id: str
       const response = await client.beta.messages.create({
         model: MODEL,
         max_tokens: 16000,
-        ...FALLBACK,
         system,
         tools: TOOLS,
         messages,
@@ -106,7 +105,7 @@ export async function converse(opts: { conversationId: string; studio: { id: str
       await append(opts.conversationId, "user", results)
     }
   } finally {
-    if (usages.length) await charge(opts.studio.id, opts.userId, sumUsage(usages), "Mike · conversación")
+    if (usages.length) await charge(opts.studio.id, opts.userId, usages, "Mike · conversación")
     await sql`update ai_conversations set updated_at = now() where id = ${opts.conversationId}`
   }
 }

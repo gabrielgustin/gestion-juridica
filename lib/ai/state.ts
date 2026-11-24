@@ -1,11 +1,10 @@
 import "server-only"
 import Anthropic from "@anthropic-ai/sdk"
 import { query, sql, type Queryable } from "@/lib/sql"
-import { costInPesos, type Usage } from "./credits"
+import { costInPesos, sumUsage, type Usage } from "./credits"
 
-export const MODEL = "claude-opus-5-5"
-/** Respaldo automático si el modelo declina por sus filtros de seguridad (lo elige Anthropic según el motivo). */
-export const FALLBACK = { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+// Haiku 5.5: la opción más económica. Si un rechazo de seguridad corta la respuesta, Mike muestra un aviso (Haiku no tiene respaldo automático).
+export const MODEL = "claude-haiku-5-5"
 
 let client: Anthropic | null = null
 /** Cliente de la API; null si no hay credenciales configuradas. */
@@ -35,8 +34,11 @@ export async function aiBlocker(studioId: string): Promise<string | null> {
   return null
 }
 
-export async function charge(studioId: string, userId: string | null, usage: Usage, detail: string) {
-  const amount = costInPesos(usage)
+/** Descuenta el costo; con varias llamadas cada una se cotiza por separado (la tarifa depende del largo de cada pedido). */
+export async function charge(studioId: string, userId: string | null, calls: Usage | Usage[], detail: string) {
+  const list = Array.isArray(calls) ? calls : [calls]
+  const amount = Math.round(list.reduce((n, u) => n + costInPesos(u), 0) * 100) / 100
+  const usage = sumUsage(list)
   await sql`insert into ai_ledger (studio_id, user_id, kind, amount, detail, input_tokens, output_tokens)
     values (${studioId}, ${userId}, 'consumo', ${-amount}, ${detail},
       ${usage.input_tokens + (usage.cache_read_input_tokens ?? 0) + (usage.cache_creation_input_tokens ?? 0)}, ${usage.output_tokens})`
